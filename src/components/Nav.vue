@@ -19,10 +19,8 @@
   <style scoped>
   nav {
     display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+
+    width: 98vw;
     z-index: 1;
     justify-content: space-between;
     align-items: center;

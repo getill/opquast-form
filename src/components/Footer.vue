@@ -18,12 +18,12 @@
   
   <style scoped>
   footer {
-    height: 20vh;
+    height: 30vh;
   background-image: url('/public/eductive-png.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  width: 100%;
+  width: 98vw;
   display: flex;
   justify-content: space-between;
   align-items: center;

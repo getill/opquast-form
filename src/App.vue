@@ -26,7 +26,7 @@ import Footer from "./components/Footer.vue";
 main {
   flex: 1;
   /* width: 100%; */
-  padding: 2rem;
+
 }
 
 #app {
