@@ -66,7 +66,7 @@
               <span class="required-asterisk">*</span>
             </div>
             <div class="input-container">
-              <select v-model="formData.genre" required>
+              <select v-model="formData.genre" required placeholder="Genre">
                 <option value="" disabled selected>Genre</option>
                 <option value="H">Homme</option>
                 <option value="F">Femme</option>
@@ -114,7 +114,7 @@
           </div>
 
           <div class="input-container">
-            <textarea v-model="formData.adresse" required placeholder="Adresse postale complète"></textarea>
+            <input v-model="formData.adresse" required placeholder="Adresse postale complète"></input>
             <span class="required-asterisk">*</span>
           </div>
 
@@ -446,6 +446,9 @@ input, select{
   border-radius: 5px;
   transition: border-color 0.3s ease;
 }
+select {
+  width: 94%;
+}
 input::placeholder {
   color: #ccc;
 }
@@ -466,9 +469,10 @@ input:focus {
 }
 
 .required-asterisk {
+  font-size: 1.5rem;
   position: absolute;
-  top: 8px;
-  right: 20px;
+  top: -8px;
+  right: 12px;
   color: #7009fb;
   font-weight: bold;
 }
