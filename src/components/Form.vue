@@ -396,6 +396,36 @@
     </div>
   </div>
 </div>
+<!-- Étape 7 - Confirmation -->
+<div v-if="currentStep === 7" class="confirmation-container">
+  <div class="confirmation-content">
+    <div class="confirmation-icon">✓</div>
+    <h3>Inscription envoyée avec succès !</h3>
+    
+    <div class="confirmation-details">
+      <p>Votre numéro de dossier : <strong>{{ dossierId }}</strong></p>
+      <p>Un email de confirmation a été envoyé à : <strong>{{ formData.email }}</strong></p>
+    </div>
+
+    <div class="confirmation-next">
+      <h4>Prochaines étapes :</h4>
+      <ol>
+        <li>Vérification de votre dossier (sous 48h ouvrées)</li>
+        <li>Email de validation ou demande de complément</li>
+        <li>Convocation à l'entretien si dossier validé</li>
+      </ol>
+    </div>
+
+    <div class="confirmation-actions">
+      <button @click="downloadRecap" class="download-btn">
+        Télécharger le récapitulatif PDF
+      </button>
+      <a :href="suiviLink" target="_blank" class="suivi-link">
+        Suivre mon dossier en ligne
+      </a>
+    </div>
+  </div>
+</div>
 
         <!-- Autres étapes... -->
 
@@ -421,6 +451,8 @@ export default {
   data() {
     return {
       currentStep: 1,
+      dossierId: '',
+      suiviLink: '',
       formData: {
         // Étape 1
         typeFormation: '',
@@ -444,31 +476,31 @@ export default {
         zoneGeo: '',
 
         // Étape 3
-      situationFamiliale: '',
-      urgenceNom: '',
-      urgenceTel: '',
-      responsableNom: '',
-      responsableTel: '',
+        situationFamiliale: '',
+        urgenceNom: '',
+        urgenceTel: '',
+        responsableNom: '',
+        responsableTel: '',
 
-      // Étape 4
-      dernierDiplome: '',
-      etablissement: '',
-      anneeObtention: '',
-      ville: '',
-      bulletins: [],
-      statutActuel: '',
-      experiencePro: '',
-      cv: [],
+        // Étape 4
+        dernierDiplome: '',
+        etablissement: '',
+        anneeObtention: '',
+        ville: '',
+        bulletins: [],
+        statutActuel: '',
+        experiencePro: '',
+        cv: [],
 
-      // Étape 5
-      modeFinancement: '',
-      employeurNom: '',
-      employeurContact: '',
-      documents: [],
+        // Étape 5
+        modeFinancement: '',
+        employeurNom: '',
+        employeurContact: '',
+        documents: [],
 
-      // Étape 6
-      attestation: false,
-      rgpd: false
+        // Étape 6
+        attestation: false,
+        rgpd: false
       },
       // Données statiques pour les select
       formationTypes: ['Initial', 'Alternance', 'Continue'],
@@ -476,96 +508,143 @@ export default {
       formations: ['Bachelor Développeur Web', 'Master Data Science', 'MBA Marketing Digital'],
       campusList: ['Paris', 'Lyon', 'Marseille', 'Bordeaux'],
       situationsFamiliales: ['Célibataire', 'Marié(e)', 'Pacsé(e)', 'Divorcé(e)'],
-    statuts: ['Étudiant', 'Salarié', 'Demandeur d\'emploi', 'Autre'],
-    modesFinancement: ['Personnel', 'Entreprise', 'Organisme', 'Autre']
+      statuts: ['Étudiant', 'Salarié', 'Demandeur d\'emploi', 'Autre'],
+      modesFinancement: ['Personnel', 'Entreprise', 'Organisme', 'Autre']
     }
   },
 
   computed: {
-  progressPercentage() {
-    return (this.currentStep / 6) * 100;
-  },
-  isMineur() {
-    if (!this.formData.dateNaissance) return false;
-    const age = new Date().getFullYear() - new Date(this.formData.dateNaissance).getFullYear();
-    return age < 18;
-  },
-  needsEmployerInfo() {
-    return ['Entreprise', 'Organisme'].includes(this.formData.modeFinancement);
-  },
-  formDataSummary() {
-  const summary = {};
-  for (const [key, value] of Object.entries(this.formData)) {
-    if (value && typeof value !== 'object' && 
-        key !== 'attestation' && key !== 'rgpd') {
-      summary[key] = value;
-    }
-  }
-  return summary;
-}
-},
-  
-methods: {
-  prevStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
-  },
-
-  getStepTitle(step) {
-    const titles = {
-      1: 'Formation souhaitée',
-      2: 'Identité & coordonnées',
-      3: 'Situation personnelle',
-      4: 'Parcours',
-      5: 'Financement & PJ',
-      6: 'Récapitulatif'
-    };
-    return titles[step] || '';
-  },
-
-  submitForm() {
-    try {
-      if (this.currentStep === 6) {
-        // Envoyer les données
-        console.log('Formulaire soumis:', this.formData);
-        // Réinitialiser le formulaire
-        this.resetForm();
-      } else {
-        this.currentStep++;
+    progressPercentage() {
+      return (this.currentStep / 7) * 100;
+    },
+    
+    isMineur() {
+      if (!this.formData.dateNaissance) return false;
+      const birthDate = new Date(this.formData.dateNaissance);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      return age < 18;
+    },
+    
+    needsEmployerInfo() {
+      return ['Entreprise', 'Organisme'].includes(this.formData.modeFinancement);
+    },
+    
+    formDataSummary() {
+      const summary = {};
+      for (const [key, value] of Object.entries(this.formData)) {
+        if (value && typeof value !== 'object' && 
+            key !== 'attestation' && key !== 'rgpd') {
+          summary[key] = value;
+        }
       }
-    } catch (error) {
-      console.error('Erreur lors de la soumission:', error);
+      return summary;
     }
   },
 
-  resetForm() {
-    this.formData = {
-      typeFormation: '',
-      domaine: '',
-      formation: '',
-      campus: '',
-      dateRentree: '',
-      // ... réinitialiser les autres champs
-    };
-    this.currentStep = 1;
-  },
+  methods: {
+    prevStep() {
+      if (this.currentStep > 1) {
+        this.currentStep--;
+      }
+    },
 
-  handleFileUpload(event, type) {
-    if (event.target.files) {
-      this.formData[type] = Array.from(event.target.files);
+    getStepTitle(step) {
+      const titles = {
+        1: 'Formation souhaitée',
+        2: 'Identité & coordonnées',
+        3: 'Situation personnelle',
+        4: 'Parcours',
+        5: 'Financement & PJ',
+        6: 'Récapitulatif',
+        7: 'Confirmation'
+      };
+      return titles[step] || '';
+    },
+
+    async submitForm() {
+      try {
+        if (this.currentStep === 6) {
+          if (!this.formData.attestation || !this.formData.rgpd) {
+            alert('Veuillez accepter les conditions requises');
+            return;
+          }
+          
+          // Simuler l'envoi du formulaire
+          await this.sendFormData();
+          
+          // Générer un numéro de dossier
+          this.dossierId = 'INS-' + new Date().getFullYear() + '-' + 
+            Math.random().toString(36).substr(2, 9).toUpperCase();
+          
+          // Générer le lien de suivi
+          this.suiviLink = `/suivi/${this.dossierId}`;
+          
+          // Passer à l'étape de confirmation
+          this.currentStep = 7;
+        } else {
+          this.currentStep++;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la soumission:', error);
+        alert('Une erreur est survenue lors de l\'envoi du formulaire');
+      }
+    },
+
+    async sendFormData() {
+      // Simulation d'envoi (à remplacer par votre logique d'API)
+      return new Promise(resolve => setTimeout(resolve, 1000));
+    },
+
+    formatDate(date) {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    },
+
+    handleFileUpload(event, type) {
+      const files = event.target.files;
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      
+      if (files.length > 3) {
+        alert("Maximum 3 fichiers autorisés");
+        event.target.value = '';
+        return;
+      }
+
+      for (const file of files) {
+        if (file.size > maxSize) {
+          alert(`Le fichier ${file.name} dépasse la taille maximum de 5MB`);
+          event.target.value = '';
+          return;
+        }
+      }
+
+      this.formData[type] = Array.from(files);
+    },
+
+    downloadRecap() {
+      // TODO: Implémenter la génération et le téléchargement du PDF
+      console.log('Téléchargement du récapitulatif...');
+    },
+
+    resetForm() {
+      this.formData = {
+        typeFormation: '',
+        domaine: '',
+        formation: '',
+        campus: '',
+        dateRentree: '',
+      };
+      this.currentStep = 1;
+      this.dossierId = '';
+      this.suiviLink = '';
     }
-  },
-
-  formatLabel(key) {
-    if (!key) return '';
-    return key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
   }
 }
-}
-
 </script>
 
 
@@ -606,6 +685,95 @@ input:focus {
   position: relative;
 }
 
+.confirmation-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.confirmation-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.confirmation-icon {
+  font-size: 48px;
+  color: #4CAF50;
+  margin-bottom: 20px;
+}
+
+.confirmation-details {
+  margin: 30px 0;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.confirmation-details p {
+  margin: 10px 0;
+  color: #4a4a4a;
+}
+
+.confirmation-next {
+  text-align: left;
+  margin: 30px 0;
+}
+
+.confirmation-next h4 {
+  color: #fcb33a;
+  margin-bottom: 15px;
+}
+
+.confirmation-next ol {
+  padding-left: 20px;
+  color: #4a4a4a;
+}
+
+.confirmation-next li {
+  margin: 10px 0;
+}
+
+.confirmation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.download-btn {
+  background-color: #7009fb;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #5a07c9;
+}
+
+.suivi-link {
+  color: #fcb33a;
+  text-decoration: none;
+  padding: 12px 24px;
+  border: 2px solid #fcb33a;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.suivi-link:hover {
+  background-color: #fcb33a;
+  color: white;
+}
+
 .required-asterisk {
   font-size: 1.5rem;
   position: absolute;
@@ -628,7 +796,7 @@ input:focus {
   padding: 20px;
 
 }
-/* Styles pour le récapitulatif */
+
 .recap-container {
   width: 100%;
   max-width: 800px;
@@ -717,9 +885,7 @@ input:focus {
   display: flex;
   flex: 1;
   flex-direction: column;
-  /* position: fixed;
-  top: 0;
-  right: 0; */
+ 
   width: 300px;
   height: 80vh;
   align-items: start;
