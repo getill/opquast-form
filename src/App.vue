@@ -7,7 +7,7 @@ import Footer from "./components/Footer.vue";
 <template>
     <Nav />
     <main>
-      <Form msg="Vite + Vue" />
+      <Form />
     </main>
     <Footer />
 </template>

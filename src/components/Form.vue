@@ -196,7 +196,7 @@
   </div>
 
   <div class="input-container">
-    <textarea v-model="formData.experiencePro" placeholder="Expériences professionnelles"></textarea>
+    <input type="text" v-model="formData.experiencePro" placeholder="Expériences professionnelles"></input>
   </div>
 
   <div class="input-container file-upload">
@@ -237,23 +237,162 @@
 <!-- Étape 6 - Récapitulatif -->
 <div v-if="currentStep === 6">
   <div class="recap-container">
-    <h3>Récapitulatif de votre inscription</h3>
-    <div v-for="(value, key) in formDataSummary" :key="key" class="recap-item">
-      <strong>{{ formatLabel(key) }}:</strong> {{ value }}
+    <h3 class="recap-title">Récapitulatif de votre inscription</h3>
+    
+    <div class="recap-grid">
+      <!-- Formation -->
+      <div class="recap-section">
+        <h4>Formation</h4>
+        <div class="recap-item">
+          <div class="item-label">Type de formation :</div>
+          <div class="item-value">{{ formData.typeFormation }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Domaine :</div>
+          <div class="item-value">{{ formData.domaine }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Formation :</div>
+          <div class="item-value">{{ formData.formation }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Campus :</div>
+          <div class="item-value">{{ formData.campus }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Date de rentrée :</div>
+          <div class="item-value">{{ formData.dateRentree }}</div>
+        </div>
+      </div>
+
+      <!-- Identité -->
+      <div class="recap-section">
+        <h4>Identité & Coordonnées</h4>
+        <div class="recap-item">
+          <div class="item-label">Nom complet :</div>
+          <div class="item-value">{{ formData.nom }} {{ formData.prenom }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Genre :</div>
+          <div class="item-value">{{ formData.genre }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Date de naissance :</div>
+          <div class="item-value">{{ formData.dateNaissance }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Lieu de naissance :</div>
+          <div class="item-value">{{ formData.lieuNaissance }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Nationalité :</div>
+          <div class="item-value">{{ formData.nationalite }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">N° Sécurité sociale :</div>
+          <div class="item-value">{{ formData.numSecu || 'Non renseigné' }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">N° Étudiant :</div>
+          <div class="item-value">{{ formData.numEtudiant || 'Non renseigné' }}</div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="recap-section">
+        <h4>Contact</h4>
+        <div class="recap-item">
+          <div class="item-label">Email :</div>
+          <div class="item-value">{{ formData.email }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Téléphone :</div>
+          <div class="item-value">{{ formData.telephone }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Adresse :</div>
+          <div class="item-value">{{ formData.adresse }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Zone géographique :</div>
+          <div class="item-value">{{ formData.zoneGeo || 'Non renseigné' }}</div>
+        </div>
+      </div>
+
+      <!-- Situation -->
+      <div class="recap-section">
+        <h4>Situation personnelle</h4>
+        <div class="recap-item">
+          <div class="item-label">Situation familiale :</div>
+          <div class="item-value">{{ formData.situationFamiliale }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Contact d'urgence :</div>
+          <div class="item-value">{{ formData.urgenceNom }} - {{ formData.urgenceTel }}</div>
+        </div>
+        <div v-if="isMineur" class="recap-item">
+          <div class="item-label">Responsable légal :</div>
+          <div class="item-value">{{ formData.responsableNom }} - {{ formData.responsableTel }}</div>
+        </div>
+      </div>
+
+      <!-- Parcours -->
+      <div class="recap-section">
+        <h4>Parcours</h4>
+        <div class="recap-item">
+          <div class="item-label">Dernier diplôme :</div>
+          <div class="item-value">{{ formData.dernierDiplome }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Établissement :</div>
+          <div class="item-value">{{ formData.etablissement }} - {{ formData.ville }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Année d'obtention :</div>
+          <div class="item-value">{{ formData.anneeObtention }}</div>
+        </div>
+        <div class="recap-item">
+          <div class="item-label">Statut actuel :</div>
+          <div class="item-value">{{ formData.statutActuel }}</div>
+        </div>
+        <div v-if="formData.experiencePro" class="recap-item">
+          <div class="item-label">Expériences professionnelles :</div>
+          <div class="item-value">{{ formData.experiencePro }}</div>
+        </div>
+      </div>
+
+      <!-- Financement -->
+      <div class="recap-section">
+        <h4>Financement</h4>
+        <div class="recap-item">
+          <div class="item-label">Mode de financement :</div>
+          <div class="item-value">{{ formData.modeFinancement }}</div>
+        </div>
+        <div v-if="needsEmployerInfo" class="recap-item">
+          <div class="item-label">Employeur/Organisme :</div>
+          <div class="item-value">{{ formData.employeurNom }}</div>
+        </div>
+        <div v-if="needsEmployerInfo" class="recap-item">
+          <div class="item-label">Contact employeur :</div>
+          <div class="item-value">{{ formData.employeurContact }}</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="checkbox-group">
-    <div class="input-container">
-      <input type="checkbox" id="attestation" v-model="formData.attestation" required>
-      <label for="attestation">J'atteste de l'exactitude des informations fournies</label>
-      <span class="required-asterisk">*</span>
-    </div>
+  <div class="validation-container">
+    <div class="checkbox-group">
+      <div class="checkbox-item">
+        <input type="checkbox" id="attestation" v-model="formData.attestation" required>
+        <label for="attestation">J'atteste de l'exactitude des informations fournies</label>
+        <span class="required-asterisk">*</span>
+      </div>
 
-    <div class="input-container">
-      <input type="checkbox" id="rgpd" v-model="formData.rgpd" required>
-      <label for="rgpd">J'accepte le traitement de mes données personnelles</label>
-      <span class="required-asterisk">*</span>
+      <div class="checkbox-item">
+        <input type="checkbox" id="rgpd" v-model="formData.rgpd" required>
+        <label for="rgpd">J'accepte le traitement de mes données personnelles</label>
+        <span class="required-asterisk">*</span>
+      </div>
     </div>
   </div>
 </div>
@@ -355,15 +494,15 @@ export default {
     return ['Entreprise', 'Organisme'].includes(this.formData.modeFinancement);
   },
   formDataSummary() {
-    // Filtered and formatted data for recap
-    const summary = {};
-    for (const [key, value] of Object.entries(this.formData)) {
-      if (value && typeof value !== 'object') {
-        summary[key] = value;
-      }
+  const summary = {};
+  for (const [key, value] of Object.entries(this.formData)) {
+    if (value && typeof value !== 'object' && 
+        key !== 'attestation' && key !== 'rgpd') {
+      summary[key] = value;
     }
-    return summary;
   }
+  return summary;
+}
 },
   
 methods: {
@@ -458,7 +597,6 @@ input:focus {
 }
 .form {
   width: 600px;
-  height: 60vh;
   display: flex;
   flex-direction: column;
 
@@ -482,13 +620,97 @@ input:focus {
 }
 
 .form-container {
-  flex: 5;
+  flex: 6;
   display: flex;
   flex-direction: column;
   align-items: center; 
-  justify-content: center;
+  justify-content: space-between;
   padding: 20px;
 
+}
+/* Styles pour le récapitulatif */
+.recap-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.recap-title {
+  text-align: center;
+  color: #7009fb;
+  margin-bottom: 30px;
+}
+
+.recap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recap-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.recap-section h4 {
+  color: #fcb33a;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f6f0ff;
+}
+
+.recap-item {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-weight: 600;
+  color: #0F0127;
+  margin-bottom: 5px;
+}
+
+.item-value {
+  color: #4a4a4a;
+}
+
+.validation-container {
+  margin-top: 30px;
+  width: 600px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: auto;
+  margin-top: 4px;
+}
+
+.checkbox-item label {
+  flex: 1;
+  font-size: 14px;
+  color: #4a4a4a;
 }
 
 .steps-container {
@@ -527,6 +749,7 @@ input:focus {
 
 .buttons {
   margin-top: 20px;
+  padding: 20px;
   display: flex;
   justify-content: space-between;
 }

@@ -1,7 +1,7 @@
 <template>
     <nav>
       <div class="logo">
-        <img src="/public/vite.svg" alt="Logo">
+        <img src="/public/eductive-grey.png" alt="Logo">
       </div>
       <div class="nav-buttons">
         <button class="inscr">Inscription</button>
@@ -46,10 +46,11 @@
     padding: 10px 20px;
     transition: background-color 0.3s ease;
   }
-    .inscr:hover {
-        background-color: #fcb33a;
-    }
-    .po { 
+  .inscr:hover, .po:hover {
+    background-color: #fcb33a;
+  }
+  .po { 
+      transition: background-color 0.3s ease;
         background-color: #7009fb;
         color: white;
         border-radius: 5px;
