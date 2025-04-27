@@ -3,7 +3,7 @@
     <div class="form-container">
       <div class="progress-bar">
         <div class="step-info">
-          <span>Étape {{ currentStep }}/6</span>
+          <span>Étape {{ currentStep }}/7</span>
           <div class="progress-container">
             <div class="progress" :style="{ width: progressPercentage + '%' }"></div>
           </div>
@@ -439,7 +439,7 @@
 
     <div class="steps-container">
       <h2>Étapes :</h2>
-      <div class="step" :class="{ active: currentStep === i + 1 }" v-for="(step, i) in 6" :key="i">
+      <div class="step" :class="{ active: currentStep === i + 1 }" v-for="(step, i) in 7" :key="i">
         {{ i + 1 }}. {{ getStepTitle(i + 1) }}
       </div>
     </div>
@@ -627,8 +627,100 @@ export default {
     },
 
     downloadRecap() {
-      // TODO: Implémenter la génération et le téléchargement du PDF
-      console.log('Téléchargement du récapitulatif...');
+      event?.preventDefault();
+    import('jspdf').then(module => {
+      const jsPDF = module.default;
+      const doc = new jsPDF();
+      
+      // Configuration du document
+      doc.setFont("helvetica");
+      doc.setFontSize(16);
+      
+      // En-tête
+      doc.text("Récapitulatif d'inscription", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Numéro de dossier : ${this.dossierId}`, 20, 30);
+      doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, 20, 40);
+      
+      let y = 60;
+      const addSection = (title, data) => {
+        doc.setFontSize(14);
+        doc.setTextColor(112, 9, 251); // #7009fb
+        doc.text(title, 20, y);
+        y += 10;
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        
+        Object.entries(data).forEach(([key, value]) => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.text(`${key} : ${value}`, 25, y);
+          y += 7;
+        });
+        y += 10;
+      };
+
+      // Formation
+      addSection("Formation", {
+        "Type": this.formData.typeFormation,
+        "Domaine": this.formData.domaine,
+        "Formation": this.formData.formation,
+        "Campus": this.formData.campus,
+        "Date de rentrée": this.formatDate(this.formData.dateRentree)
+      });
+
+      // Identité
+      addSection("Identité & Coordonnées", {
+        "Nom complet": `${this.formData.nom} ${this.formData.prenom}`,
+        "Date de naissance": this.formatDate(this.formData.dateNaissance),
+        "Lieu de naissance": this.formData.lieuNaissance,
+        "Nationalité": this.formData.nationalite,
+        "Email": this.formData.email,
+        "Téléphone": this.formData.telephone,
+        "Adresse": this.formData.adresse
+      });
+
+      // Situation
+      addSection("Situation personnelle", {
+        "Situation familiale": this.formData.situationFamiliale,
+        "Contact d'urgence": `${this.formData.urgenceNom} - ${this.formData.urgenceTel}`
+      });
+
+      // Parcours
+      addSection("Parcours", {
+        "Dernier diplôme": this.formData.dernierDiplome,
+        "Établissement": this.formData.etablissement,
+        "Année": this.formData.anneeObtention,
+        "Ville": this.formData.ville,
+        "Statut actuel": this.formData.statutActuel
+      });
+
+      // Financement
+      addSection("Financement", {
+        "Mode": this.formData.modeFinancement,
+        "Employeur": this.formData.employeurNom || 'Non applicable',
+        "Contact employeur": this.formData.employeurContact || 'Non applicable'
+      });
+
+      // Pied de page
+      doc.setFontSize(10);
+      doc.setTextColor(128);
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.text(
+          `Page ${i} sur ${pageCount}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: "center" }
+        );
+      }
+
+      // Téléchargement
+      doc.save(`Inscription_${this.dossierId}.pdf`);
+    });
     },
 
     resetForm() {
